@@ -17,10 +17,21 @@ describe User do
       let(:unfollowed_post) do 
         FactoryGirl.create(:micropost, user: FactoryGirl.create(:user))
       end
-      
+      let(:followed_user) { FactoryGirl.create(:user) }
+
+      before do
+        @user.follow!(followed_user)
+        3.times { followed_user.microposts.create!(content: "Lorem ipsum") }
+      end
+
       its(:feed) { should include(newer_micropost) }
       its(:feed) { should include(older_micropost) }
       its(:feed) { should_not include(unfollowed_post) }
+      its(:feed) do
+        followed_user.microposts.each do |micropost|
+          should include(micropost)
+        end
+      end
     end
     
     it "should destroy associated microposts" do
@@ -35,7 +46,6 @@ describe User do
     it "should have the right microposts in the right order" do
       expect(@user.microposts.to_a).to eq [newer_micropost, older_micropost]
     end
-    
   end
   before do
     @user = User.new(name: "Example User", email: "user@example.com", 
@@ -154,7 +164,7 @@ describe User do
     it { should_not be_valid }
   end
 
-  describe "with pass that's too short" do
+  describe "with password that's too short" do
     before { @user.password = @user.password_confirmation = "a" * 5 }
     it { should be_invalid}
   end
@@ -173,8 +183,5 @@ describe User do
       it { should_not eq user_for_invalid_password }
       specify { expect(user_for_invalid_password).to be_false}
     end
-  end
-    
-
 end
-
+end
