@@ -13,3 +13,4 @@ Used Gems
 - factory_girl_rails
 - cucumber-rails
 - database_cleaner
+- jquery-rails
